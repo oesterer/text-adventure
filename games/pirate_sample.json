@@ -1,0 +1,97 @@
+{
+  "title": "Parrot's Clue",
+  "summary": "Board a pirate sloop, win the crew's trust, and uncover the captain's hidden map.",
+  "start_location": "pirate_deck",
+  "player": {
+    "name": "Adventurer",
+    "description": "A curious wanderer with a knack for solving riddles.",
+    "starting_inventory": []
+  },
+  "locations": [
+    {
+      "id": "pirate_deck",
+      "name": "Main Deck",
+      "image": "images/pirate_deck.png",
+      "description": "Rolling waves slap against the hull as the salty wind cuts across the deck.",
+      "details": "Barrels, coils of rope, and a patched sail frame the cramped deck of the sloop. The captain's cabin sits aft, its weathered door watched over by wary eyes.",
+      "objects": [
+        {
+          "id": "cabin_door",
+          "name": "cabin door",
+          "description": "A heavy oak door with iron bands guards the captain's quarters.",
+          "details": "The hinges look recently oiled. A simple latch keeps it shut from this side.",
+          "can_pick_up": false,
+          "can_move": false,
+          "initial_state": {
+            "open": "false"
+          }
+        }
+      ],
+      "actors": [
+        {
+          "id": "grizzled_pirate",
+          "name": "First Mate Briggs",
+          "description": "A scar-chinned pirate with a braided beard and a suspicious glare.",
+          "persona": "Gruff but loyal to the captain, secretly eager for shore leave.",
+          "background": "Briggs has sailed with the captain for a decade and keeps the crew in line.",
+          "dialogue": {
+            "default": "Briggs grunts, 'Keep yer hands where I can see 'em, landlubber.'",
+            "cabin": "'Cabin's off limits unless the captain says otherwise,' Briggs warns."
+          }
+        },
+        {
+          "id": "scarlet_parrot",
+          "name": "Scarlet",
+          "description": "A brilliant red parrot perched near the rigging, eyes gleaming with mischief.",
+          "persona": "Sharp-tongued mimic who repeats gossip she shouldn't know.",
+          "background": "The captain rescued Scarlet from a sinking brig. Now she hoards secrets.",
+          "dialogue": {
+            "default": "Scarlet squawks, 'Pieces of eight! Mind the captain!'",
+            "map": "'Map's in the cabin! Map's in the cabin!' Scarlet screeches."
+          }
+        }
+      ],
+      "pathways": [
+        {
+          "id": "door_to_cabin",
+          "name": "cabin door",
+          "description": "The door leading into the captain's cabin.",
+          "target": "captains_cabin",
+          "locked": false,
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "id": "captains_cabin",
+      "name": "Captain's Cabin",
+      "image": "images/captains_cabin.png",
+      "description": "Lantern light spills across a cramped cabin cluttered with charts and nautical tools.",
+      "details": "A writing desk is bolted to the floor beside a brass compass. The smell of salt, ink, and pipe smoke lingers in the air.",
+      "objects": [
+        {
+          "id": "treasure_map",
+          "name": "treasure map",
+          "description": "A cracked parchment map inked with island silhouettes and dotted lines.",
+          "details": "A red X marks a secluded cove on Skullfang Isle.",
+          "can_pick_up": true,
+          "can_move": false,
+          "initial_state": {
+            "open": "false"
+          }
+        }
+      ],
+      "actors": [],
+      "pathways": [
+        {
+          "id": "door_to_deck",
+          "name": "deck",
+          "description": "Steps back out onto the deck.",
+          "target": "pirate_deck",
+          "locked": false,
+          "hidden": false
+        }
+      ]
+    }
+  ]
+}

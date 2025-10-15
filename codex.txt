@@ -1,0 +1,59 @@
+## Game Engine
+
+Game engine for text based games. Examples of games are murder mysteries, treasure hunts or escape rooms.
+The game consists of a Player, a collection of Locations and a start Location. 
+For a game session the state of all Locations, Objects, Actors and the Player have to be maintained (stored for consistency).
+A game can be defined as meta data consisting of images and text defining the various Locations, Objects, Actors and Pathways
+
+
+## Location
+
+A location consists of:
+
+-Image
+-Description
+-Additional details
+-Objects
+-Actors
+-Pathways
+
+The main screen displays the Location image, Location description and allows the Player to make further inquiries on the Location using text input. The game will answer the text input using an LLM / AI where the information is limited to the details provided. Certain commands are handled directly by the game instead of passed to the AI
+
+## Objects
+
+-Can be interacted with
+-Can contain other objects
+-Additional details
+-Have a state (such as open or closed)
+-Some objects can be picked up and added to Inventory
+-Some objects can be moved
+
+## Actors
+
+-Each actor has a persona and background information
+-Each actor can be conversed wtih
+-Can give information 
+-Can give objects to player
+
+## Pathways
+
+-Allow transistion from one Location to another
+-Pathways can initially be locked
+-Pathways can be initially hidden
+
+## Player
+
+-Has inventory of objects
+-Has a state and other variables
+
+
+## Sample Game
+
+Generate the game engine, metadata structure and a small sample game.
+
+The sample game should have two Locations:
+
+
+Pirate boat with a pirate and parrot as Actors.
+There is a door leading to the captains cabin, this is Location 2
+In the captains cabin there is a map with the location of the treasure
