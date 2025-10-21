@@ -12,11 +12,14 @@ from .models import (
     PlayerMetadata,
     build_initial_state,
 )
+from .llm import LLMClient, LLMUnavailableError
 
 __all__ = [
     "CommandResponse",
     "GameEngine",
     "load_game",
+    "LLMClient",
+    "LLMUnavailableError",
     "ActorMetadata",
     "GameMetadata",
     "GameState",

@@ -11,7 +11,7 @@
     {
       "id": "pirate_deck",
       "name": "Main Deck",
-      "image": "images/pirate_deck.png",
+      "image": "images/PirateDeck.png",
       "description": "Rolling waves slap against the hull as the salty wind cuts across the deck.",
       "details": "Barrels, coils of rope, and a patched sail frame the cramped deck of the sloop. The captain's cabin sits aft, its weathered door watched over by wary eyes.",
       "objects": [
@@ -65,7 +65,7 @@
     {
       "id": "captains_cabin",
       "name": "Captain's Cabin",
-      "image": "images/captains_cabin.png",
+      "image": "images/PirateCabin.png",
       "description": "Lantern light spills across a cramped cabin cluttered with charts and nautical tools.",
       "details": "A writing desk is bolted to the floor beside a brass compass. The smell of salt, ink, and pipe smoke lingers in the air.",
       "objects": [

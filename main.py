@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from engine import GameEngine, load_game
+from engine import GameEngine, LLMClient, load_game
 
 
 def load_metadata(path: Path) -> dict:
@@ -23,12 +23,22 @@ def run_cli(game: GameEngine) -> None:
         print(response.output)
 
 
-def build_game(sample: bool = True, *, render_ascii_art: bool = True) -> GameEngine:
+def build_game(
+    sample: bool = True,
+    *,
+    render_ascii_art: bool = True,
+    with_llm: bool = True,
+) -> GameEngine:
     root = Path(__file__).parent
     path = root / "games" / "pirate_sample.json"
     metadata_dict = load_metadata(path)
     metadata = load_game(metadata_dict)
-    return GameEngine(metadata, render_ascii_art=render_ascii_art)
+    llm_client = None
+    if with_llm:
+        candidate = LLMClient()
+        if candidate.available():
+            llm_client = candidate
+    return GameEngine(metadata, render_ascii_art=render_ascii_art, llm_client=llm_client)
 
 
 if __name__ == "__main__":

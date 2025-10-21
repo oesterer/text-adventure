@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List
 from wsgiref.simple_server import make_server
 
-from engine import GameEngine, load_game
+from engine import GameEngine, LLMClient, load_game
 
 ROOT = Path(__file__).resolve().parent
 GAME_PATH = ROOT / "games" / "pirate_sample.json"
@@ -14,7 +14,10 @@ GAME_PATH = ROOT / "games" / "pirate_sample.json"
 
 def load_engine() -> GameEngine:
     metadata = json.loads(GAME_PATH.read_text(encoding="utf-8"))
-    return GameEngine(load_game(metadata), render_ascii_art=False)
+    llm_client = LLMClient()
+    if not llm_client.available():
+        llm_client = None
+    return GameEngine(load_game(metadata), render_ascii_art=False, llm_client=llm_client)
 
 
 def html_response(start_response, body: str, status: str = "200 OK"):

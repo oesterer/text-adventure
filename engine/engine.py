@@ -15,6 +15,7 @@ from .models import (
     PathwayMetadata,
     build_initial_state,
 )
+from .llm import LLMClient, LLMUnavailableError, SerializedGameContext
 
 
 @dataclass
@@ -24,12 +25,20 @@ class CommandResponse:
 
 
 class GameEngine:
-    def __init__(self, metadata: GameMetadata, *, render_ascii_art: bool = True) -> None:
+    def __init__(
+        self,
+        metadata: GameMetadata,
+        *,
+        render_ascii_art: bool = True,
+        llm_client: Optional[LLMClient] = None,
+    ) -> None:
         self.metadata = metadata
         self.state: GameState = build_initial_state(metadata)
         self.state.locations[self.state.player.location_id].visited = True
         self._image_cache: Dict[str, str] = {}
         self.render_ascii_art = render_ascii_art
+        self.llm_client = llm_client
+        self._llm_history: List[Dict[str, str]] = []
 
     # Public API -----------------------------------------------------------
     def handle_command(self, raw_input: str) -> CommandResponse:
@@ -70,12 +79,8 @@ class GameEngine:
 
         # Placeholder for LLM-backed responses.
         lore = self.describe_location_details()
-        fallback = (
-            "The narrative engine would answer via an AI, "
-            "drawing only from known details. For now, consult the location notes:\n"
-            f"{lore}"
-        )
-        return CommandResponse(fallback, handled=False)
+        llm_text, via_llm = self._llm_response(command, lore)
+        return CommandResponse(llm_text, handled=via_llm)
 
     def describe_current_location(self) -> str:
         location = self.current_location
@@ -365,6 +370,44 @@ class GameEngine:
             },
             "inventory": inventory,
         }
+
+    def _serialize_for_llm(self) -> SerializedGameContext:
+        locations = list(self.metadata.locations.values())
+        inventory_objects: List[ObjectMetadata] = []
+        for obj_id in self.state.player.inventory:
+            meta = self._object_by_id(obj_id)
+            if meta:
+                inventory_objects.append(meta)
+        return SerializedGameContext(
+            title=self.metadata.title,
+            summary=self.metadata.summary,
+            current_location=self.current_location,
+            locations=locations,
+            player_name=self.metadata.player.name,
+            inventory=inventory_objects,
+        )
+
+    def _llm_response(self, command: str, lore: str) -> Tuple[str, bool]:
+        fallback = (
+            "The narrative engine would answer via an AI, "
+            "drawing only from known details. For now, consult the location notes:\n"
+            f"{lore}"
+        )
+        if not self.llm_client:
+            return fallback, False
+
+        try:
+            context = self._serialize_for_llm()
+            response = self.llm_client.generate_response(command, context, self._llm_history)
+        except LLMUnavailableError:
+            return fallback, False
+        except Exception:
+            return fallback, False
+
+        self._llm_history.append({"command": command, "response": response})
+        if len(self._llm_history) > 10:
+            self._llm_history = self._llm_history[-10:]
+        return response, True
 
     def _png_to_ascii(self, path: Path) -> str:
         width, height, pixels = self._decode_png_rgba(path)

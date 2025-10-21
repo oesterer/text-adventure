@@ -10,6 +10,10 @@ python3 webapp.py
 
 Then open http://127.0.0.1:8000 to explore the adventure in a styled web UI with inline imagery and a command console. Use the restart button to reset the session.
 
+## Enabling LLM narration
+
+Store your OpenAI API key at `~/.apikeys/openai` (plain text, no whitespace). When present, both the CLI and browser server automatically route free-form exploration prompts through the `gpt-4.1-mini` model via the Responses API. Unhandled commands then receive in-world replies driven by the game metadata (locations, objects, actors, and pathways). If the key is missing the engine falls back to deterministic canned text.
+
 ## Running the sample game (terminal)
 
 ```bash
@@ -27,6 +31,8 @@ Useful commands once the CLI starts:
 - `go <path>` — move through a visible pathway
 - `inventory` — show what you are carrying
 - `help` — list built-in commands (anything else falls back to the narrative AI hook)
+
+The engine still handles structural commands (movement, talking to named actors, opening objects, quitting) locally to maintain deterministic state.
 
 Type `exit` or `quit` to leave the session.
 
