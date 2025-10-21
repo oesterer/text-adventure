@@ -29,6 +29,7 @@ Useful commands once the CLI starts:
 - `talk <actor>` — hear what someone has to say
 - `take <object>` — add portable items to your inventory
 - `go <path>` — move through a visible pathway
+- `map` — study the captain's treasure chart when you're in the cabin
 - `inventory` — show what you are carrying
 - `help` — list built-in commands (anything else falls back to the narrative AI hook)
 

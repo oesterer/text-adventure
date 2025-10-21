@@ -158,10 +158,51 @@ def captains_cabin(width: int = 256, height: int = 144) -> List[List[Color]]:
     return pixels
 
 
+def treasure_map(width: int = 256, height: int = 144) -> List[List[Color]]:
+    pixels: List[List[Color]] = []
+    for y in range(height):
+        row: List[Color] = []
+        for x in range(width):
+            base = 220 - int((y / max(1, height - 1)) * 40) - int((x / max(1, width - 1)) * 20)
+            row.append((base, base - 10, base - 20, 255))
+        pixels.append(row)
+
+    # Stylised coastline
+    for y in range(int(height * 0.28), int(height * 0.8)):
+        for x in range(int(width * 0.25), int(width * 0.7)):
+            dx = (x - width * 0.33) / 2
+            dy = (y - height * 0.55)
+            if dx * dx + dy * dy < 420:
+                pixels[y][x] = (150, 180, 160, 255)
+
+    # Treasure X
+    cx, cy = int(width * 0.68), int(height * 0.48)
+    for delta in range(-24, 25):
+        if 0 <= cy + delta < height:
+            if 0 <= cx + delta < width:
+                pixels[cy + delta][cx + delta] = (200, 40, 40, 255)
+            if 0 <= cx - delta < width:
+                pixels[cy + delta][cx - delta] = (200, 40, 40, 255)
+
+    # Compass rose
+    rx, ry = int(width * 0.18), int(height * 0.28)
+    for x in range(rx - 10, rx + 11):
+        if 0 <= x < width:
+            pixels[ry][x] = (80, 50, 30, 255)
+    for y in range(ry - 10, ry + 11):
+        if 0 <= y < height:
+            pixels[y][rx] = (80, 50, 30, 255)
+
+    return pixels
+
+
 def main() -> None:
     root = Path(__file__).resolve().parent.parent
     write_png(root / "images" / "pirate_deck.png", 256, 144, pirate_deck())
     write_png(root / "images" / "captains_cabin.png", 256, 144, captains_cabin())
+    write_png(root / "images" / "PirateDeck.png", 256, 144, pirate_deck())
+    write_png(root / "images" / "PirateCabin.png", 256, 144, captains_cabin())
+    write_png(root / "images" / "PirateMap.png", 256, 144, treasure_map())
 
 
 if __name__ == "__main__":

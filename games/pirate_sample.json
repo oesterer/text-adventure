@@ -42,9 +42,9 @@
         {
           "id": "scarlet_parrot",
           "name": "Scarlet",
-          "description": "A brilliant red parrot perched near the rigging, eyes gleaming with mischief.",
-          "persona": "Sharp-tongued mimic who repeats gossip she shouldn't know.",
-          "background": "The captain rescued Scarlet from a sinking brig. Now she hoards secrets.",
+          "description": "A jet-black crow insisting its plumage is the brightest scarlet on the seas.",
+          "persona": "Preening raconteur who swears it's a parrot despite the obvious.",
+          "background": "Rescued from a plague ship, the crow reinvented itself as Scarlet the parrot and never looked back.",
           "dialogue": {
             "default": "Scarlet squawks, 'Pieces of eight! Mind the captain!'",
             "map": "'Map's in the cabin! Map's in the cabin!' Scarlet screeches."
@@ -81,7 +81,19 @@
           }
         }
       ],
-      "actors": [],
+      "actors": [
+        {
+          "id": "captain_skeleton",
+          "name": "Captain Rivenshade",
+          "description": "A skeletal figure in tattered finery, jaw clamped in stubborn denial.",
+          "persona": "Imperious sea captain who refuses to accept his own demise.",
+          "background": "Rivenshade vanished during a mutiny. His bones now lounge in his cabin, still plotting voyages.",
+          "dialogue": {
+            "default": "The captain rasps, 'Mind yer manners—I'm merely resting me eyes, not dead.'",
+            "treasure": "'A captain never abandons his hoard. Chart it yourself, whelp.'"
+          }
+        }
+      ],
       "pathways": [
         {
           "id": "door_to_deck",

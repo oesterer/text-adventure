@@ -273,6 +273,39 @@ def landing_page(state_json: str) -> str:
     button.primary:hover {
       transform: translateY(-1px);
     }
+    .spinner-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5, 10, 20, 0.4);
+      backdrop-filter: blur(2px);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .spinner-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .spinner-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #4f8bff;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
     @media (max-width: 900px) {
       .stage {
         grid-template-columns: 1fr;
@@ -318,6 +351,9 @@ def landing_page(state_json: str) -> str:
       <button class=\"primary\" type=\"submit\">Send</button>
     </form>
   </div>
+  <div class=\"spinner-overlay hidden\" id=\"loading-indicator\">
+    <div class=\"spinner-icon\"></div>
+  </div>
   <script id=\"bootstrap-data\" type=\"application/json\">__STATE__</script>
   <script>
     const historyEl = document.getElementById('history');
@@ -330,6 +366,16 @@ def landing_page(state_json: str) -> str:
     const form = document.getElementById('command-form');
     const input = document.getElementById('command-input');
     const resetBtn = document.getElementById('reset-btn');
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    function setLoading(active) {
+      if (!loadingIndicator) return;
+      if (active) {
+        loadingIndicator.classList.remove('hidden');
+      } else {
+        loadingIndicator.classList.add('hidden');
+      }
+    }
 
     function escapeHtml(text) {
       const mapping = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -382,7 +428,8 @@ def landing_page(state_json: str) -> str:
       renderHistory(data.history);
     }
 
-    async function fetchState() {
+    async function fetchState(showSpinner = false) {
+      if (showSpinner) setLoading(true);
       try {
         const response = await fetch('/api/state');
         if (!response.ok) {
@@ -392,10 +439,13 @@ def landing_page(state_json: str) -> str:
         updateView(data);
       } catch (error) {
         console.error(error);
+      } finally {
+        if (showSpinner) setLoading(false);
       }
     }
 
     async function sendCommand(command) {
+      setLoading(true);
       try {
         const response = await fetch('/api/command', {
           method: 'POST',
@@ -411,6 +461,8 @@ def landing_page(state_json: str) -> str:
       } catch (error) {
         console.error(error);
         return null;
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -443,7 +495,7 @@ def landing_page(state_json: str) -> str:
     if (initialState) {
       updateView(initialState);
     }
-    fetchState();
+    fetchState(false);
   </script>
 </body>
 </html>"""

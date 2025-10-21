@@ -57,6 +57,9 @@ class GameEngine:
         if lowered == "help":
             return CommandResponse(self.describe_help())
 
+        if lowered in {"map", "view map", "study map", "look at map"}:
+            return CommandResponse(self.show_map())
+
         if lowered.startswith("inspect ") or lowered.startswith("examine "):
             target = self._extract_target(lowered)
             return CommandResponse(self.inspect_object(target))
@@ -75,6 +78,8 @@ class GameEngine:
 
         if lowered.startswith("go ") or lowered.startswith("move "):
             target = self._extract_target(lowered)
+            if target == "map":
+                return CommandResponse(self.show_map())
             return CommandResponse(self.move_to_location(target))
 
         # Placeholder for LLM-backed responses.
@@ -129,7 +134,7 @@ class GameEngine:
 
     def describe_help(self) -> str:
         return (
-            "Commands: look, details, inventory, inspect <object>, take <object>, open <object>, "
+            "Commands: look, details, inventory, map, inspect <object>, take <object>, open <object>, "
             "talk <actor>, go <path>."
         )
 
@@ -293,31 +298,7 @@ class GameEngine:
         return target or None
 
     def _render_location_image(self, location: LocationMetadata) -> Optional[str]:
-        path_label = location.image.strip()
-        if not path_label:
-            return None
-        cached = self._image_cache.get(path_label)
-        if cached is not None:
-            return cached
-
-        asset_path = Path(path_label)
-        if not asset_path.is_absolute():
-            asset_path = Path.cwd() / asset_path
-
-        content: str
-        if asset_path.suffix.lower() == ".png":
-            try:
-                content = self._png_to_ascii(asset_path)
-            except Exception:
-                content = f"[unable to render image: {path_label}]"
-        else:
-            try:
-                content = asset_path.read_text(encoding="utf-8")
-            except OSError:
-                content = f"[missing artwork: {path_label}]"
-
-        self._image_cache[path_label] = content
-        return content
+        return self._render_image_asset(location.image)
 
     def view_state(self) -> Dict[str, object]:
         location = self.current_location
@@ -371,6 +352,18 @@ class GameEngine:
             "inventory": inventory,
         }
 
+    def show_map(self) -> str:
+        if self.current_location.id != "captains_cabin":
+            return "There is no map to study here."
+        art = None
+        if self.render_ascii_art:
+            art = self._render_image_asset("images/PirateMap.png")
+        map_object = next((obj for obj in self.current_location.objects if obj.id == "treasure_map"), None)
+        description = map_object.details if map_object and map_object.details else "The weathered parchment hints at a hidden cove marked with a bold red X."
+        if art:
+            return f"{art}\n{description}"
+        return description + "\nMap available at /assets/images/PirateMap.png"
+
     def _serialize_for_llm(self) -> SerializedGameContext:
         locations = list(self.metadata.locations.values())
         inventory_objects: List[ObjectMetadata] = []
@@ -408,6 +401,32 @@ class GameEngine:
         if len(self._llm_history) > 10:
             self._llm_history = self._llm_history[-10:]
         return response, True
+
+    def _render_image_asset(self, path_label: str) -> Optional[str]:
+        path_label = path_label.strip()
+        if not path_label:
+            return None
+        cached = self._image_cache.get(path_label)
+        if cached is not None:
+            return cached
+
+        asset_path = Path(path_label)
+        if not asset_path.is_absolute():
+            asset_path = Path.cwd() / asset_path
+
+        if asset_path.suffix.lower() == ".png":
+            try:
+                content = self._png_to_ascii(asset_path)
+            except Exception:
+                content = f"[unable to render image: {path_label}]"
+        else:
+            try:
+                content = asset_path.read_text(encoding="utf-8")
+            except OSError:
+                content = f"[missing artwork: {path_label}]"
+
+        self._image_cache[path_label] = content
+        return content
 
     def _png_to_ascii(self, path: Path) -> str:
         width, height, pixels = self._decode_png_rgba(path)
